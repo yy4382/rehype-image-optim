@@ -1,13 +1,17 @@
 {
   "name": "rehype-image-optim",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "husky",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
   },
   "keywords": [],
-  "author": "",
+  "author": "Yunfi",
   "license": "ISC",
   "type": "module",
   "exports": {
@@ -17,7 +21,13 @@
     "unist-util-visit": "^5.0.0"
   },
   "devDependencies": {
+    "@types/eslint__js": "^8.42.3",
     "@types/hast": "^3.0.4",
-    "typescript": "^5.5.4"
+    "eslint": "^9.9.0",
+    "husky": "^9.1.4",
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.1.0"
   }
 }

@@ -23,5 +23,6 @@
     "declarationMap": true,
 
     "lib": ["es2022", "dom", "dom.iterable"]
-  }
+  },
+  "exclude": ["eslint.config.mjs", "dist/**/*"]
 }
