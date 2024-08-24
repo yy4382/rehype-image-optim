@@ -1,41 +1,41 @@
 import { visit } from "unist-util-visit";
 import type { Root } from "hast";
+import transformer, { transformers } from "./link-transformer";
 
-type OptimizeOptions = string[] | string;
-export default function rehypeImageOptimization(options?: {
+export default function rehypeImageOptimization<
+  Provider extends keyof typeof transformers,
+>(options: {
+  provider: Provider;
   originValidation?: string | RegExp | ((arg0: string) => boolean);
   /**
    * Options for the image optimization. Used to replace the image `src` property.
    *
-   * Can be `string` or `string[]`. If an array is provided, it is joined with a comma.
+   * If set to undefined, will not replace the `src` property.
    *
-   * The following examples are equivalent:
-   * @example "f=auto,w=320,q=80"
-   * @example ["f=auto", "w=320", "q=80"]
-   * @example ["f=auto,w=320", "q=80"]
-   *
-   * @see https://developers.cloudflare.com/images/transform-images/transform-via-url/#options
+   * Else, this value is passed to the transformer function.
    */
-  optimizeOptions?: OptimizeOptions;
+  optimizeSrcOptions?: Parameters<(typeof transformers)[Provider]>[1];
   /**
    * Options for the image optimization. Used to replace the image `srcset` property.
    * The `descriptor` is a string that describes the size of the image or density.
    *
-   * @example [{ optimOptions: "w=320", descriptor: "320w" }, { optimOptions: "w=640", descriptor: "640w" }]
-   * @example [{ optimOptions: "w=640", descriptor: "2x" }]
    * @see https://developers.cloudflare.com/images/transform-images/make-responsive-images/
    */
-  srcsetOptionsList?: { optimOptions: OptimizeOptions; descriptor: string }[];
+  srcsetOptionsList?: [
+    Parameters<(typeof transformers)[Provider]>[1],
+    string,
+  ][];
   sizesOptionsList?: string[] | string;
   style?: string;
 }) {
   const {
+    provider,
     originValidation,
-    optimizeOptions,
+    optimizeSrcOptions: optimizeOptions,
     srcsetOptionsList,
     sizesOptionsList,
     style,
-  } = options ?? {};
+  } = options;
   const validateOrigin = (origin: string) => {
     if (originValidation === undefined) {
       return true;
@@ -57,15 +57,14 @@ export default function rehypeImageOptimization(options?: {
       if (node.tagName !== "img" || !node.properties.src) {
         return;
       }
+      const originalLink = node.properties.src.toString();
       let origin: string;
-      let pathname: string;
 
       try {
-        const url = new URL(node.properties.src.toString());
+        const url = new URL(originalLink);
         origin = url.origin;
-        pathname = url.pathname;
       } catch {
-        console.error("Invalid URL:", node.properties.src);
+        console.error("Invalid URL:", originalLink);
         return;
       }
 
@@ -74,17 +73,17 @@ export default function rehypeImageOptimization(options?: {
       }
 
       if (optimizeOptions !== undefined)
-        node.properties.src = generateOptimizedUrl(
-          origin,
-          pathname,
+        node.properties.src = transformer(
+          originalLink,
+          provider,
           optimizeOptions,
         );
 
       if (srcsetOptionsList !== undefined)
         node.properties.srcset = srcsetOptionsList
           .map(
-            ({ optimOptions, descriptor }) =>
-              `${generateOptimizedUrl(origin, pathname, optimOptions)} ${descriptor}`,
+            ([optimOptions, descriptor]) =>
+              `${transformer(originalLink, provider, optimOptions)} ${descriptor}`,
           )
           .join(", ");
 
@@ -94,23 +93,10 @@ export default function rehypeImageOptimization(options?: {
             ? sizesOptionsList
             : sizesOptionsList.join(", ");
 
-      node.properties.style += style ?? "";
+      if (style) {
+        if (node.properties.style === undefined) node.properties.style = style;
+        else node.properties.style += " " + style;
+      }
     });
   };
 }
-
-const joinOptions = (options: OptimizeOptions) => {
-  if (typeof options === "string") {
-    return options;
-  }
-  return options.join(",");
-};
-
-const generateOptimizedUrl = (
-  uriOrigin: string,
-  ogPath: string,
-  optimOptions: OptimizeOptions,
-) => {
-  const optionString = joinOptions(optimOptions);
-  return `${uriOrigin}/cdn-cgi/image/${optionString}${ogPath}`;
-};
