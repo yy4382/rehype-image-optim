@@ -1,0 +1,13 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Cloudflare > should not change src if \`optimizeSrcOptions\` is undefined 1`] = `"<img src="https://example.com/image.jpg">"`;
+
+exports[`Cloudflare > should work with default options 1`] = `"<img src="https://example.com/cdn-cgi/image/f=auto/image.jpg">"`;
+
+exports[`Cloudflare > should work with sizes 1`] = `"<img src="https://example.com/image.jpg" sizes="(max-width: 600px) 100vw, 50vw">"`;
+
+exports[`Cloudflare > should work with srcset 1`] = `"<img src="https://example.com/image.jpg" srcset="https://example.com/cdn-cgi/image/f=auto/image.jpg 1x, https://example.com/cdn-cgi/image/w=200/image.jpg 2x">"`;
+
+exports[`Cloudflare > should work with style 1`] = `"<img src="https://example.com/image.jpg" style="width: 100%">"`;
+
+exports[`Cloudflare > should work with style 2`] = `"<img src="https://example.com/image.jpg" style="width: 100%; height: auto;">"`;
