@@ -43,6 +43,12 @@ describe('"Cloudflare" provider', () => {
       "https://example2.com/cdn-cgi/image/f=auto/https://example.com/image.jpg",
     );
   });
+  it("should work with relative link", () => {
+    const originalLink = "/image.jpg";
+    expect(linkTransformer(originalLink, "cloudflare", {})).toBe(
+      "/cdn-cgi/image/f=auto/image.jpg",
+    );
+  });
   it("should return original link when invalid URL", () => {
     const originalLink = "invalid-url";
     expect(linkTransformer(originalLink, "cloudflare", {})).toBe(originalLink);
