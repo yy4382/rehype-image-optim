@@ -26,8 +26,16 @@ export default function linkTransformer(
     imgOrigin = url.origin;
     imgPath = url.pathname;
   } catch {
-    console.error("Invalid URL", originalLink);
-    return originalLink;
+    if (!originalLink.startsWith("/")) {
+      console.error(
+        "Invalid URL",
+        originalLink,
+        " Unable to use relative link that don't start with '/'",
+      );
+      return originalLink;
+    }
+    imgOrigin = "";
+    imgPath = originalLink;
   }
 
   const optionString = joinOptions(optimizeOptions);

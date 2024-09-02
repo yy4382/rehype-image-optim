@@ -1,10 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { visit } from "unist-util-visit";
 import type { Root } from "hast";
-import transformer, { transformers } from "./link-transformer";
+import transformers from "./link-transformer";
+type TransformerTypes = keyof typeof transformers;
+type TransformerFunction<T = any> = (original: string, options: T) => string;
 
-export default function rehypeImageOptimization<
-  Provider extends keyof typeof transformers,
->(options: {
+type OptimizeOptions<
+  Provider extends TransformerTypes | TransformerFunction<any>,
+> = Provider extends TransformerTypes
+  ? (typeof transformers)[Provider] extends (
+      originalLink: string,
+      options: infer Options,
+    ) => string
+    ? Options
+    : never
+  : Provider extends TransformerFunction<infer T>
+    ? T
+    : never;
+
+function transformer<
+  Provider extends TransformerTypes | TransformerFunction<any>,
+  Options extends OptimizeOptions<Provider>,
+>(originalLink: string, provider: Provider, options: Options) {
+  if (typeof provider === "function") {
+    return provider(originalLink, options);
+  }
+  return transformers[provider as TransformerTypes](
+    originalLink,
+    options as any,
+  );
+}
+
+type Options<
+  Provider extends TransformerTypes | TransformerFunction<any>,
+  OptOptions extends OptimizeOptions<Provider>,
+> = {
   provider: Provider;
   originValidation?: string | RegExp | ((arg0: string) => boolean);
   /**
@@ -14,20 +44,22 @@ export default function rehypeImageOptimization<
    *
    * Else, this value is passed to the transformer function.
    */
-  optimizeSrcOptions?: Parameters<(typeof transformers)[Provider]>[1];
+  optimizeSrcOptions?: OptOptions;
   /**
    * Options for the image optimization. Used to replace the image `srcset` property.
    * The `descriptor` is a string that describes the size of the image or density.
    *
    * @see https://developers.cloudflare.com/images/transform-images/make-responsive-images/
    */
-  srcsetOptionsList?: [
-    Parameters<(typeof transformers)[Provider]>[1],
-    string,
-  ][];
+  srcsetOptionsList?: [OptOptions, string][];
   sizesOptionsList?: string[] | string;
   style?: string;
-}) {
+};
+
+export default function rehypeImageOptimization<
+  Provider extends TransformerTypes | TransformerFunction<any>,
+  OptOptions extends OptimizeOptions<Provider>,
+>(options: Options<Provider, OptOptions>) {
   const {
     provider,
     originValidation,
@@ -99,4 +131,11 @@ export default function rehypeImageOptimization<
       }
     });
   };
+}
+
+export function defineOptions<
+  Provider extends TransformerTypes | TransformerFunction<any>,
+  OptOptions extends OptimizeOptions<Provider>,
+>(options: Options<Provider, OptOptions>) {
+  return options;
 }

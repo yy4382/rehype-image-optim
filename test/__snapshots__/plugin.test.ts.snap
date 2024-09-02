@@ -11,3 +11,7 @@ exports[`Cloudflare > should work with srcset 1`] = `"<img src="https://example.
 exports[`Cloudflare > should work with style 1`] = `"<img src="https://example.com/image.jpg" style="width: 100%">"`;
 
 exports[`Cloudflare > should work with style 2`] = `"<img src="https://example.com/image.jpg" style="width: 100%; height: auto;">"`;
+
+exports[`Custom transformer > should work with custom transformer 1`] = `"<img src="https://exreplacedmple.com/image.jpg">"`;
+
+exports[`Custom transformer > should work with srcset 1`] = `"<img src="https://example.com/image.jpg" srcset="https://example.com/cdn-cgi/image/f=auto/image.jpg 1x, https://example.com/cdn-cgi/image/w=200/image.jpg 2x">"`;

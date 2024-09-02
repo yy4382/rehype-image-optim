@@ -1,6 +1,7 @@
-import rehypeImageOptimization from "../lib";
+import rehypeImageOptimization, { defineOptions } from "../lib";
 import { rehype } from "rehype";
 import { it, expect, describe } from "vitest";
+import cloudflare from "../lib/link-transformer/cloudflare";
 
 const input = `<img src="https://example.com/image.jpg">`;
 describe("Cloudflare", () => {
@@ -45,6 +46,40 @@ describe("Cloudflare", () => {
         style: "height: auto;",
       }),
     ).toMatchSnapshot();
+  });
+});
+
+describe("Custom transformer", () => {
+  it("should work with custom transformer", async () => {
+    const result = await process(input, {
+      provider: (
+        originalLink,
+        options: {
+          a: string;
+          /**
+           * Test doc comment
+           */
+          b: boolean;
+        },
+      ) => {
+        return originalLink.replace(options.a, "replaced");
+      },
+      optimizeSrcOptions: { a: "a" },
+    });
+    expect(result).toMatchSnapshot();
+  });
+  it("should work with srcset", async () => {
+    const result = await process(
+      input,
+      defineOptions({
+        provider: cloudflare,
+        srcsetOptionsList: [
+          [{}, "1x"],
+          [{ options: "w=200" }, "2x"],
+        ],
+      }),
+    );
+    expect(result).toMatchSnapshot();
   });
 });
 

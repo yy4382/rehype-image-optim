@@ -1,10 +1,10 @@
 import { it, expect, describe } from "vitest";
-import linkTransformer from "../lib/link-transformer";
+import linkTransformers from "../lib/link-transformer";
 
 describe('"Cloudflare" provider', () => {
   it("should return auto format link when default option", () => {
     const originalLink = "https://example.com/image.jpg";
-    expect(linkTransformer(originalLink, "cloudflare", {})).toBe(
+    expect(linkTransformers.cloudflare(originalLink, {})).toBe(
       "https://example.com/cdn-cgi/image/f=auto/image.jpg",
     );
   });
@@ -19,7 +19,7 @@ describe('"Cloudflare" provider', () => {
     ];
     options.forEach((option) => {
       expect(
-        linkTransformer(originalLink, "cloudflare", {
+        linkTransformers.cloudflare(originalLink, {
           options: option,
         }),
       ).toBe(targetLink);
@@ -28,7 +28,7 @@ describe('"Cloudflare" provider', () => {
   it("should use original origin when optimized origin is same", () => {
     const originalLink = "https://example.com/image.jpg";
     expect(
-      linkTransformer(originalLink, "cloudflare", {
+      linkTransformers.cloudflare(originalLink, {
         resultOrigin: "https://example.com",
       }),
     ).toBe("https://example.com/cdn-cgi/image/f=auto/image.jpg");
@@ -36,7 +36,7 @@ describe('"Cloudflare" provider', () => {
   it("should use full link when optimized origin is different", () => {
     const originalLink = "https://example.com/image.jpg";
     expect(
-      linkTransformer(originalLink, "cloudflare", {
+      linkTransformers.cloudflare(originalLink, {
         resultOrigin: "https://example2.com",
       }),
     ).toBe(
@@ -45,12 +45,12 @@ describe('"Cloudflare" provider', () => {
   });
   it("should work with relative link", () => {
     const originalLink = "/image.jpg";
-    expect(linkTransformer(originalLink, "cloudflare", {})).toBe(
+    expect(linkTransformers.cloudflare(originalLink, {})).toBe(
       "/cdn-cgi/image/f=auto/image.jpg",
     );
   });
   it("should return original link when invalid URL", () => {
     const originalLink = "invalid-url";
-    expect(linkTransformer(originalLink, "cloudflare", {})).toBe(originalLink);
+    expect(linkTransformers.cloudflare(originalLink, {})).toBe(originalLink);
   });
 });
