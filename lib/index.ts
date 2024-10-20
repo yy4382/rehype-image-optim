@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { visit } from "unist-util-visit";
 import type { Root } from "hast";
-import transformers from "./link-transformer";
+import transformers from "./link-transformer/index.js";
 type TransformerTypes = keyof typeof transformers;
 type TransformerFunction<T = any> = (original: string, options: T) => string;
 

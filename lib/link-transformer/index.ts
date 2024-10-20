@@ -1,4 +1,4 @@
-import cloudflare from "./cloudflare";
+import cloudflare from "./cloudflare.js";
 
 export const transformers = {
   cloudflare,

@@ -8,13 +8,13 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "moduleResolution": "Bundler",
+    "moduleResolution": "NodeNext",
 
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
 
-    "module": "ESNext",
+    "module": "NodeNext",
     "outDir": "dist",
     "sourceMap": true,
 
