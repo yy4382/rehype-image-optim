@@ -1,7 +1,7 @@
 {
   "name": "rehype-image-optim",
   "version": "0.0.1",
-  "description": "",
+  "description": "rehype plugin to change the `src` (and `srcset`/`sizes`) of images to optimized versions from your image CDN/optimization provider",
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
@@ -12,13 +12,24 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "keywords": [],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "rehype",
+    "image",
+    "optimization",
+    "cdn"
+  ],
   "author": "Yunfi",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./dist/lib/index.js"
   },
+  "main": "./dist/lib/index.js",
   "dependencies": {
     "unist-util-visit": "^5.0.0"
   },
